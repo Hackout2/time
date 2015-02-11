@@ -1,9 +1,14 @@
-#' Convert Hagelloch 1861 measles outbreak into obkData
+#' Convert Hagelloch 1861 measles outbreak into obkData.
 #' 
 #' Small converter function to take the hagelloch.df data.frame
 #' available in the surveillance package and make an obkData object
 #' out of it.
 #' 
+#' @details This function is not really one you would put in a package.
+#' Instead, the function would be called for it's output.
+#' 
+#' @author Michael Höhle <http://www.math.su.se/~hoehle>
+#' @export
 hagelloch2obkData <- function() {
   #Use Hagelloch measles data (as available in the surveillance package) instead
   data("hagelloch", package="surveillance")

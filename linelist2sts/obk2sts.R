@@ -29,9 +29,6 @@ hagelloch.obk@records$timeERU$date
 sts <- surveillance::linelist2sts(df, dateCol="ERU",aggregate.by="1 day")
 print(sts)
 
-#Do it using OutbreakTools
-get.incidence(hagelloch.obk, "ERU")
-
 #Plot using surveillance functionality
 #Possible actions: do plot in ggplot2 instead
 plot(sts,xaxis.tickFreq = list("%d"=at2ndChange, "%m"=atChange),
