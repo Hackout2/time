@@ -5,7 +5,9 @@
 \title{Plot incidence time series}
 \usage{
 plotIncidence(x, dates, bin = 7, fill.by = NULL, split.by = NULL,
-  shade.by = NULL, start.at = NULL, stop.at = NULL)
+  shade.by = NULL, start.at = NULL, stop.at = NULL, xlab = NULL,
+  ylab = "Incidence", date.format = "\%d \%b \%Y", xlab.angle = 45,
+  xlines = "1 week")
 }
 \arguments{
 \item{x}{a data.frame containing the data to be plotted.}
@@ -22,7 +24,17 @@ plotIncidence(x, dates, bin = 7, fill.by = NULL, split.by = NULL,
 
 \item{start.at}{a starting date for the incidence; defaults to the earliest date of the dataset}
 
-\item{start.at}{a stoping date for the incidence; defaults to the latest date of the dataset}
+\item{stop.at}{a stoping date for the incidence; defaults to the latest date of the dataset}
+
+\item{xlab}{a label for the x axis}
+
+\item{ylab}{a label for the y axis}
+
+\item{date.format}{a character string indicating the format of the dates}
+
+\item{xlab.angle}{an integer indicating the angle of the dates}
+
+\item{xlines}{a character string indicating the time interval between vertical lines}
 }
 \description{
 This function provides advanced plotting facilities for incidence time series using ggplot2
@@ -31,5 +43,8 @@ This function provides advanced plotting facilities for incidence time series us
 data("toy")
 head(toy)
 plotIncidence(toy, dates="dateOfOnset")
+}
+\author{
+Thibaut Jombart \email{thibautjombart@gmail.com}
 }
 

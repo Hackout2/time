@@ -1,3 +1,4 @@
+#'
 #'Plot incidence time series
 #'
 #'This function provides advanced plotting facilities for incidence time series using ggplot2
@@ -8,8 +9,14 @@
 #' @param split.by a character string or an integer indicating which column to use to split the charts
 #' @param shade.by a character string or an integer indicating which column to use to shade the bars
 #' @param start.at a starting date for the incidence; defaults to the earliest date of the dataset
-#' @param start.at a stoping date for the incidence; defaults to the latest date of the dataset
+#' @param stop.at a stoping date for the incidence; defaults to the latest date of the dataset
+#' @param xlab a label for the x axis
+#' @param ylab a label for the y axis
+#' @param date.format a character string indicating the format of the dates
+#' @param xlab.angle an integer indicating the angle of the dates
+#' @param xlines a character string indicating the time interval between vertical lines
 #'
+#' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
 #' @examples
 #'
@@ -25,7 +32,8 @@
 ## plotIncidence ##
 ###################
 plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by=NULL,
-                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence") {
+                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
+                          date.format="%d %b %Y", xlab.angle=45, xlines="1 week") {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
@@ -56,9 +64,9 @@ plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by
 
     ## CUSTOMISATION OF THE PLOT ##
     ## ANNOTATIONS
-    date.annot <- scale_x_date(limits=date.range, breaks = "2 week",
-                               labels=date_format("%d %b %Y"))
-    date.rota <- theme(axis.text.x = element_text(angle = 90, vjust = .5))
+    date.annot <- scale_x_date(limits=date.range, breaks = xlines,
+                               labels=date_format(date.format))
+    date.rota <- theme(axis.text.x = element_text(angle = xlab.angle, vjust = .5))
     xy.labs <- labs(x=xlab,y=ylab)
 
     ## GENERATE THE PLOT ##
