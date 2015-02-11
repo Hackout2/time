@@ -4,7 +4,7 @@
 #'This function provides advanced plotting facilities for incidence time series using ggplot2
 #' @param x a data.frame containing the data to be plotted.
 #' @param dates a character string or an integer indicating which column contains the dates to use
-#' @param bin an integer indicating the size of the time window to use for the incidence computation
+#' @param bin an integer indicating the size of the time window (in days) to use for the incidence computation
 #' @param fill.by a character string or an integer indicating which column to use to color the bars
 #' @param split.by a character string or an integer indicating which column to use to split the charts
 #' @param shade.by a character string or an integer indicating which column to use to shade the bars
@@ -13,8 +13,8 @@
 #' @param xlab a label for the x axis
 #' @param ylab a label for the y axis
 #' @param date.format a character string indicating the format of the dates
-#' @param xlab.angle an integer indicating the angle of the dates
-#' @param xlines a character string indicating the time interval between vertical lines
+#' @param angle an integer indicating the angle of the dates
+#' @param xbreaks a character string indicating the time interval between vertical lines
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
@@ -22,8 +22,13 @@
 #'
 #' data("toy")
 #' head(toy)
+#'
+#' ## basic plot
 #' plotIncidence(toy, dates="dateOfOnset")
 #'
+#' ## change column indication, and bin size to 2 days
+#' plotIncidence(toy, dates=1, bin=2)
+#' plotIncidence(toy, dates=1, bin=2, split.by="gender", fill.by=3)
 #'
 #' @import ggplot2 scales
 #'
@@ -33,7 +38,7 @@
 ###################
 plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by=NULL,
                           start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
-                          date.format="%d %b %Y", xlab.angle=45, xlines="1 week") {
+                          date.format="%d %b %Y", angle=45, xbreaks="1 week") {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
@@ -64,9 +69,9 @@ plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by
 
     ## CUSTOMISATION OF THE PLOT ##
     ## ANNOTATIONS
-    date.annot <- scale_x_date(limits=date.range, breaks = xlines,
+    date.annot <- scale_x_date(limits=date.range, breaks = xbreaks,
                                labels=date_format(date.format))
-    date.rota <- theme(axis.text.x = element_text(angle = xlab.angle, vjust = .5))
+    date.rota <- theme(axis.text.x = element_text(angle = angle, vjust = .5))
     xy.labs <- labs(x=xlab,y=ylab)
 
     ## GENERATE THE PLOT ##

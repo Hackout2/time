@@ -6,15 +6,15 @@
 \usage{
 plotIncidence(x, dates, bin = 7, fill.by = NULL, split.by = NULL,
   shade.by = NULL, start.at = NULL, stop.at = NULL, xlab = NULL,
-  ylab = "Incidence", date.format = "\%d \%b \%Y", xlab.angle = 45,
-  xlines = "1 week")
+  ylab = "Incidence", date.format = "\%d \%b \%Y", angle = 45,
+  xbreaks = "1 week")
 }
 \arguments{
 \item{x}{a data.frame containing the data to be plotted.}
 
 \item{dates}{a character string or an integer indicating which column contains the dates to use}
 
-\item{bin}{an integer indicating the size of the time window to use for the incidence computation}
+\item{bin}{an integer indicating the size of the time window (in days) to use for the incidence computation}
 
 \item{fill.by}{a character string or an integer indicating which column to use to color the bars}
 
@@ -32,9 +32,9 @@ plotIncidence(x, dates, bin = 7, fill.by = NULL, split.by = NULL,
 
 \item{date.format}{a character string indicating the format of the dates}
 
-\item{xlab.angle}{an integer indicating the angle of the dates}
+\item{angle}{an integer indicating the angle of the dates}
 
-\item{xlines}{a character string indicating the time interval between vertical lines}
+\item{xbreaks}{a character string indicating the time interval between vertical lines}
 }
 \description{
 This function provides advanced plotting facilities for incidence time series using ggplot2
@@ -42,7 +42,13 @@ This function provides advanced plotting facilities for incidence time series us
 \examples{
 data("toy")
 head(toy)
+
+## basic plot
 plotIncidence(toy, dates="dateOfOnset")
+
+## change column indication, and bin size to 2 days
+plotIncidence(toy, dates=1, bin=2)
+plotIncidence(toy, dates=1, bin=2, split.by="gender", fill.by=3)
 }
 \author{
 Thibaut Jombart \email{thibautjombart@gmail.com}
