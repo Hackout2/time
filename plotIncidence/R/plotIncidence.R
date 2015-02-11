@@ -59,18 +59,15 @@ plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by
     date.annot <- scale_x_date(limits=date.range, breaks = "2 week",
                                labels=date_format("%d %b %Y"))
     date.rota <- theme(axis.text.x = element_text(angle = 90, vjust = .5))
-
     xy.labs <- labs(x=xlab,y=ylab)
-
-    ## SPLIT
-    ##perCountry <- facet_grid(Country ~ .)
 
     ## GENERATE THE PLOT ##
     out <- ggplot(x) +
         geom_histogram(aes_string(x=dates, fill=fill.by, alpha=shade.by),
                        breaks=as.numeric(dates.breaks)) +
-                           xy.labs
+                           xy.labs + date.annot + date.rota
 
+    if(!is.null(split.by)) out <- out + facet_grid(paste(split.by, ".", sep="~"))
 
 
     ## RETURN OUTPUT ##
