@@ -14,16 +14,23 @@ get.data(ToyOutbreak, "DateInfected")
 
 #Make hagelloch an obkData object and extract individual info
 hagelloch.obk <- hagelloch2obkData()
+save(file="data/hagelloch.RData", list=c("hagelloch.obk"))
 df <- hagelloch.obk@individuals
 
 #Look at the records entry.
 names(hagelloch.obk@records)
-get.dates(hagelloch.obk)
+length(get.dates(hagelloch.obk, data="records"))
+get.data(hagelloch.obk, "timeERU")
+
+hagelloch.obk@records$timeERU$date
 
 #Use the surveillance::linelist2sts function to convert this to an sts object
 #Todo: Add a splitBy argument
 sts <- surveillance::linelist2sts(df, dateCol="ERU",aggregate.by="1 day")
 print(sts)
+
+#Do it using OutbreakTools
+get.incidence(hagelloch.obk, "ERU")
 
 #Plot using surveillance functionality
 #Possible actions: do plot in ggplot2 instead

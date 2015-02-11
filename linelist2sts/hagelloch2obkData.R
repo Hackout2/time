@@ -19,8 +19,8 @@ hagelloch2obkData <- function() {
   records <- lapply(dateVars, function(varName) {
     data.frame(individualID=hagelloch.df$individualID, date=hagelloch.df[,varName])
   })
-  #Give the list appropriate names
-  names(records) <- dateVars
+  #Give the list appropriate names (ensure names are not the same as in 'individuals')
+  names(records) <- paste0("time",dateVars)
   
   #Create obkData object 
   hagelloch.obk <- new("obkData", individuals=hagelloch.df, records=records)
