@@ -1,3 +1,5 @@
+setwd("/Users/rolinavangaalen/Documents/Hackout/time/linelist2sts/")
+
 library("OutbreakTools")
 library("surveillance")
 source("hagelloch2obkData.R")
@@ -38,3 +40,4 @@ plot(sts2,xaxis.tickFreq = list("%m"=atChange),
      xaxis.labelFormat = "%b-%Y",
      legend.opts=NULL, 
      xlab="Date of rash",ylab="No. individuals")
+
