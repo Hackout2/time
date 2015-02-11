@@ -16,6 +16,10 @@ get.data(ToyOutbreak, "DateInfected")
 hagelloch.obk <- hagelloch2obkData()
 df <- hagelloch.obk@individuals
 
+#Look at the records entry.
+names(hagelloch.obk@records)
+get.dates(hagelloch.obk)
+
 #Use the surveillance::linelist2sts function to convert this to an sts object
 #Todo: Add a splitBy argument
 sts <- surveillance::linelist2sts(df, dateCol="ERU",aggregate.by="1 day")
