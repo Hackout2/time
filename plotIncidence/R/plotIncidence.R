@@ -1,5 +1,5 @@
 #'
-#'Plot incidence time series
+#'Plot incidence time series using histograms
 #'
 #'This function provides advanced plotting facilities for incidence time series using ggplot2
 #' @param x a data.frame containing the data to be plotted.
@@ -15,6 +15,7 @@
 #' @param date.format a character string indicating the format of the dates
 #' @param angle an integer indicating the angle of the dates
 #' @param xbreaks a character string indicating the time interval between vertical lines
+#' @param col.pal an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
@@ -38,13 +39,18 @@
 ###################
 plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by=NULL,
                           start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
-                          date.format="%d %b %Y", angle=45, xbreaks="1 week") {
+                          date.format="%d %b %Y", angle=45, xbreaks="1 week",
+                          col.pal=1) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
     if(!is.null(fill.by) && is.numeric(fill.by)) fill.by <- names(x)[fill.by]
     if(!is.null(split.by) && is.numeric(split.by)) split.by <- names(x)[split.by]
     if(!is.null(shade.by) && is.numeric(shade.by)) shade.by <- names(x)[shade.by]
+    if(!is.null(col.pal) && (col.pal<0 || col.pal>8)) {
+        col.pal <- NULL
+        warning("col.pal must be an integer from 1 to 8 - setting col.pal=NULL")
+    }
 
     ## FIND OUT THE RIGHT BREAKS ##
     x.dates <- as.Date(x[,dates])
@@ -81,7 +87,7 @@ plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by
                            xy.labs + date.annot + date.rota
 
     if(!is.null(split.by)) out <- out + facet_grid(paste(split.by, ".", sep="~"))
-
+    if(!is.null(col.pal)) out <- out + scale_fill_brewer(type="qual", palette=col.pal)
 
     ## RETURN OUTPUT ##
     return(out)
