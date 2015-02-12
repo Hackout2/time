@@ -4,10 +4,12 @@
 \alias{mapIncidence}
 \title{Plot incidence time series using histograms}
 \usage{
-mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL, source = "osm",
-  start.at = NULL, stop.at = NULL, xlab = NULL, ylab = "Incidence",
-  date.format = "\%d \%b \%Y", angle = 45, xbreaks = "1 week",
-  col.pal = 1, heights = c(0.75, 0.25))
+mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL,
+  source = "google", zoom = "auto", start.at = NULL, stop.at = NULL,
+  xlab = NULL, ylab = "Incidence", date.format = "\%d \%b \%Y",
+  angle = 90, xbreaks = "1 week", col.pal = 1, heights = c(0.75, 0.25),
+  ani.width = 800, ani.height = ani.width, point.size = 5,
+  annot.size = 20, xy.annot = FALSE)
 }
 \arguments{
 \item{x}{a data.frame containing the data to be plotted.}
@@ -41,13 +43,24 @@ mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL, source = "osm",
 \item{col.pal}{an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used}
 
 \item{heights}{a vector of two numbers summing to 1 indicating the relative heights of the map and the incidence time series}
+
+\item{ani.width}{an integer indicating the width of the image, in pixels}
+
+\item{ani.height}{an integer indicating the height of the image, in pixels; no-square images are not guaranteed to work}
+
+\item{point.size}{an integer indicating the size of point to be used for incidence}
+
+\item{annot.size}{an integer indicating the size of the text annotations}
+
+\item{xy.annot}{a logical indicating whether latitudes and longitudes should be shown}
 }
 \description{
 This function provides advanced plotting facilities for incidence time series using ggplot2
 }
 \examples{
 \dontrun{
-
+data(zombie_outbreak)
+mapIncidence(head(zombie_outbreak,1000), 3,"x.coord","y.coord", fill.by="gender")
 }
 }
 \author{

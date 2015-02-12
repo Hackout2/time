@@ -3,6 +3,7 @@
 export(mapIncidence)
 export(plotIncidence)
 import(OutbreakTools)
+import(animation)
 import(ggmap)
 import(ggplot2)
 import(gridExtra)

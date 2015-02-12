@@ -42,6 +42,7 @@
 ## mapIncidence ##
 ##################
 mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google",
+                         zoom = "auto",
                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                          date.format="%d %b %Y", angle=90, xbreaks="1 week",
                          col.pal=1, heights=c(0.75, 0.25),
@@ -99,7 +100,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
                             max(lat,na.rm=TRUE)))
 
     ## fectch map
-    base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source))
+    base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source, zoom=zoom))
 
     ## compute cumulative incidence
     xyn <- na.omit(data.frame(xyTable(data.frame(lon,lat))))
