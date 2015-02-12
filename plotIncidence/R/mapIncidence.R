@@ -17,6 +17,7 @@
 #' @param angle an integer indicating the angle of the dates
 #' @param xbreaks a character string indicating the time interval between vertical lines
 #' @param col.pal an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used
+#' @param heights a vector of two numbers summing to 1 indicating the relative heights of the map and the incidence time series
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
@@ -33,7 +34,7 @@
 mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
                           start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                           date.format="%d %b %Y", angle=45, xbreaks="1 week",
-                          col.pal=1) {
+                          col.pal=1, heights=c(0.75, 0.25)) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
@@ -93,11 +94,51 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
     head(xyn)
 
     ## get breaks for cum. incidence, force 1 to be in the scale
-    breaks <- pretty(1:max(xyn,na.rm=TRUE), n=6)
-    breaks <- breaks[breaks>1] # remove potential 0/1
-    breaks <- c(1,breaks)
+    map.breaks <- pretty(1:max(xyn,na.rm=TRUE), n=6)
+    map.breaks <- map.breaks[map.breaks>1] # remove potential 0/1
+    map.breaks <- c(1,map.breaks)
 
-    ## GENERATE THE PLOT ##
+
+    ## GENERATE THE MOVIE ##
+    for(i in 2:length(dates.breaks)){
+        ## open png device
+        png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
+
+        ## data for cumulative incidence
+        toKeep <- which(x[,dates] <= dates.breaks[i-1])
+        xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c("lon","lat")])))
+        names(xyn.cum)[3] <- "Incidence"
+
+        ## data for current incidence
+        toKeep <- which(x[,dates] >= dates.breaks[i-1] &
+                        x[,dates] < dates.breaks[i])
+
+        p1 <- basemap +
+            geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
+                       alpha=.4, col="black") +
+                           geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
+                                       col="red", alpha=.2, size=2,
+                                       position = position_jitter(h=.05, w=.05)) +
+                                           scale_size_continuous("Cumulative \nincidence",
+                                                                 range=c(2,15),
+                                                                 limits=c(0,MAX.NB.CASES),
+                                                                 breaks=c(1,50,100,200,500,1000)) +
+                                                                     theme_bw() +
+                                                                         labs(x=NULL,y=NULL)
+
+        ## make incidence curve
+        tempdat <- x[x[,dates]<=dates.breaks[i],]
+        p2 <- ggplot(tempdat) +
+            geom_histogram(aes_string(x=dates, fill=fill.by, alpha=shade.by),
+                           breaks=as.numeric(dates.breaks) + 0.01) +
+                               scale_y_continuous(limits=c(0, max.incid)) +
+                                   xy.labs + date.annot + date.rota
+
+
+        grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1))
+
+        dev.off()
+    }
 
     ## RETURN OUTPUT ##
     return(out)
