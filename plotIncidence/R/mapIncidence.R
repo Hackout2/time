@@ -34,9 +34,10 @@
 ## mapIncidence ##
 ##################
 mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google",
-                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
-                          date.format="%d %b %Y", angle=45, xbreaks="1 week",
-                          col.pal=1, heights=c(0.75, 0.25)) {
+                         start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
+                         date.format="%d %b %Y", angle=45, xbreaks="1 week",
+                         col.pal=1, heights=c(0.75, 0.25),
+                         ani.width=800, ani.height=ani.width) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
@@ -139,13 +140,11 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
                                    scale_y_continuous(limits=c(0, max.incid)) +
                                        xy.labs + date.annot + date.rota
 
-            grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1))
+            suppressWarnings(grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1)))
 
-            ## dev.off()
-        }
-    })
+        }}, ani.width=ani.width, ani.height=ani.height, verbose=FALSE)
 
     ## RETURN OUTPUT ##
-    return(out)
+    return(invisible(NULL))
 } # end mapIncidence
 
