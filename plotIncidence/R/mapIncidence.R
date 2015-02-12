@@ -18,6 +18,11 @@
 #' @param xbreaks a character string indicating the time interval between vertical lines
 #' @param col.pal an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used
 #' @param heights a vector of two numbers summing to 1 indicating the relative heights of the map and the incidence time series
+#' @param ani.width an integer indicating the width of the image, in pixels
+#' @param ani.height an integer indicating the height of the image, in pixels; no-square images are not guaranteed to work
+#' @param point.size an integer indicating the size of point to be used for incidence
+#' @param annot.size an integer indicating the size of the text annotations
+#' @param xy.annot a logical indicating whether latitudes and longitudes should be shown
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
