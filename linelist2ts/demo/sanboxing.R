@@ -42,8 +42,8 @@ plot(as.zoo(sts.xts), plot.type="multiple",col=pal,lwd=3,xlab="Onset of rash",yl
 #(see http://stackoverflow.com/questions/13848218/drawing-a-multiline-graph-with-ggplot2-from-a-zoo-object)
 p <- autoplot(sts.xts, facet = NULL)
 p
-p + aes(linetype = NULL)
-p + scale_x_date(labels = date_format("%d-%b"), xlab("Onset of rash")) +  scale_y_continuous(ylab("No. individuals"))
+#p + aes(linetype = NULL)
+p + scale_x_date(labels = date_format("%d-%b-%Y"), xlab("Onset of rash")) +  scale_y_continuous(ylab("No. individuals"))
 
 ############# Interactive graphics using dygraph ###########
 #You can click and drag to zoom. Double-clicking will zoom you back out. Shift-drag will pan

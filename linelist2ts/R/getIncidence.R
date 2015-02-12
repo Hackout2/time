@@ -125,36 +125,35 @@ setMethod("get.incidence2", "obkData", function(x, data, where=NULL, val.min=NUL
 #' @export
 inc2xts <- function(incList) {
   #Convert each entry of incList from data.frame to xts. It's a list of xts obj
-  xtsList <- lapply(incList, function(list) {
-    lapply(list, function(df) {
-      with(df,  as.xts(incidence, order.by=date))
-    })
-  })
-
-
-  do.call(cbind.data.frame, lapply(incList, function(x) do.call(cbind.data.frame, x)))
-
+  #xtsList <- lapply(incList, function(list) {
+  #  lapply(list, function(df) {
+  #    with(df,  as.xts(incidence, order.by=date))
+  #  })
+  #})
 
   #Code looping over all xts entries and merging them. data.table or plyr
   #might do this better?
-  xts <- Reduce(cbind,lapply(xtsList, function(list) Reduce(cbind, list)))
+  #xts <- Reduce(cbind,lapply(xtsList, function(list) Reduce(cbind, list)))
 
   #Manual way of getting pretty (?) column names
-  lvl1 <- names(xtsList)
-  lvl2 <- lapply(xtsList, names)
-  mynames <- paste(rep(lvl1,times=sapply(lvl2,length)), do.call(c,lvl2),sep="-")
-  dimnames(xts)[[2]] <- mynames
+  #lvl1 <- names(xtsList)
+  #lvl2 <- lapply(xtsList, names)
+  #mynames <- paste(rep(lvl1,times=sapply(lvl2,length)), do.call(c,lvl2),sep="-")
+  #dimnames(xts)[[2]] <- mynames
 
-  #Is there a better way?!?!
+  #Alternative way of doing this. Boil down the data.frame and make an xts object out of it
+  #df <- do.call(cbind.data.frame, lapply(incList, function(x) do.call(cbind.data.frame, x)))
+  #df <- do.call(cbind.data.frame,unlist(incList,recursive=FALSE))
 
-  #Sanity checks
-  #all(xtsList[["SEX"]]$male == xts[,"SEX-male"])
-  #all(xtsList[["SEX"]]$female == xts[,"SEX-female"])
-  #all(xtsList[["AGEGRP"]][[1]] == xts[,"AGEGRP-(0,5]"])
+  #incidence <- df[,seq(2,ncol(df),by=2)]
+  #Make the names prettier
+  #colnames(incidence) <- gsub("\\.incidence$","",colnames(incidence))
 
-  #xts <- Reduce(cbind, Reduce(cbind, xtsList))
-  #do.call(cbind, xtsList)
-  #data.table::rbindlist(xtsList)
+  #This was really the most efficient way of collapsing it.
+  df <- sapply(unlist(incList,recursive=FALSE), "[[", 2)
+
+  #Create xts object
+  xts <- xts(x=incidence, order.by=incList[[1]][[1]]$date)
 
   return(xts)
 }
