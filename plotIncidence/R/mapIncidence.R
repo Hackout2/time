@@ -3,35 +3,42 @@
 #'
 #'This function provides advanced plotting facilities for incidence time series using ggplot2
 #' @param x a data.frame containing the data to be plotted.
-#' @param
+#' @param dates a character string or an integer indicating which column contains the dates to use
+#' @param lon a character string or an integer indicating which column contains longitudes ('x axis')
+#' @param lat a character string or an integer indicating which column contains latitudes ('y axis')
+#' @param bin an integer indicating the size of the time window (in days) to use for the incidence computation
+#' @param fill.by a character string or an integer indicating which column to use to color the bars
+#' @param source a character string indicating the type of maps to be used
+#' @param start.at a starting date for the incidence; defaults to the earliest date of the dataset
+#' @param stop.at a stoping date for the incidence; defaults to the latest date of the dataset
+#' @param xlab a label for the x axis
+#' @param ylab a label for the y axis
+#' @param date.format a character string indicating the format of the dates
+#' @param angle an integer indicating the angle of the dates
+#' @param xbreaks a character string indicating the time interval between vertical lines
+#' @param col.pal an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
 #' @examples
 #'
-#' data("toy")
-#' head(toy)
 #'
-#' ## basic plot
-#' plotIncidence(toy, dates="dateOfOnset")
 #'
-#' ## change column indication, and bin size to 2 days
-#' plotIncidence(toy, dates=1, bin=2)
-#' plotIncidence(toy, dates=1, bin=2, split.by="gender", fill.by=3)
-#'
-#' @import ggplot2 scales
+#' @import ggplot2 scales ggmap
 #'
 
 ##################
 ## mapIncidence ##
 ##################
-mapIncidence <- function(x, dates, bin=7, fill.by=NULL,
+mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
                           start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                           date.format="%d %b %Y", angle=45, xbreaks="1 week",
                           col.pal=1) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
+    lon <- x[,lon,drop=TRUE]
+    lat <- x[,lat,drop=TRUE]
     if(!is.null(fill.by) && is.numeric(fill.by)) fill.by <- names(x)[fill.by]
     if(!is.null(col.pal) && (col.pal<0 || col.pal>8)) {
         col.pal <- NULL
@@ -67,11 +74,24 @@ mapIncidence <- function(x, dates, bin=7, fill.by=NULL,
 
 
     ## GET MAP MATERIAL ##
+    ## get bounding box
+    bound.box <- with(x, c(min(lon,na.rm=TRUE),
+                            min(lat,na.rm=TRUE),
+                            max(lon,na.rm=TRUE),
+                            max(lat,na.rm=TRUE)))
+
     ## fectch map
+    baseMap <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source))
 
     ## compute cumulative incidence
+    xyn <- na.omit(data.frame(xyTable(data.frame(lon,lat))))
+    names(xyn)[3] <- "Incidence"
+    head(xyn)
 
-
+    ## get breaks for cum. incidence, force 1 to be in the scale
+    breaks <- pretty(1:max(xyn,na.rm=TRUE), n=6)
+    breaks <- breaks[breaks>1] # remove potential 0/1
+    breaks <- c(1,breaks)
 
     ## GENERATE THE PLOT ##
 
