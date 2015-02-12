@@ -37,7 +37,8 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                          date.format="%d %b %Y", angle=45, xbreaks="1 week",
                          col.pal=1, heights=c(0.75, 0.25),
-                         ani.width=800, ani.height=ani.width) {
+                         ani.width=800, ani.height=ani.width,
+                         point.size=5, annot.size=20, xy.annot=FALSE) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
@@ -125,11 +126,17 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
                 suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
                                             alpha=.4, col="black")) +
                                                 geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
-                                                            col="red", alpha=.2, size=2,
+                                                            col="red", alpha=.2, size=point.size,
                                                             position = position_jitter(h=.05, w=.05)) +
             scale_size_continuous("Cumulative \nincidence", range=c(2,15),
                                   limits=c(0,map.max.size), breaks=map.breaks) +
-                                      theme_bw() + labs(x=NULL,y=NULL)
+                                      theme_bw() + labs(x=NULL,y=NULL) +
+                                      theme(text = element_text(size=annot.size))
+
+            if(!xy.annot) p1 <- p1 + theme(axis.text.x = element_blank(),
+                                          axis.ticks.x = element_blank(),
+                                          axis.text.y = element_blank(),
+                                          axis.ticks.y = element_blank())
 
             ## BOTTOM PANEL: INCIDENCE TIME SERIES
             ## make incidence curve
@@ -137,8 +144,11 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             p2 <- ggplot(tempdat) +
                 geom_histogram(aes_string(x=dates, fill=fill.by),
                                breaks=as.numeric(dates.breaks) + 0.01) +
-                                   scale_y_continuous(limits=c(0, max.incid)) +
-                                       xy.labs + date.annot + date.rota
+                               geom_vline(xintercept = as.numeric(dates.breaks[i])) +
+                               scale_y_continuous(limits=c(0, max.incid)) +
+                               xy.labs + date.annot + date.rota +
+                               theme(text = element_text(size=annot.size))
+
 
             suppressWarnings(grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1)))
 
