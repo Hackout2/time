@@ -24,7 +24,7 @@
 #'
 #'
 #'
-#' @import ggplot2 scales ggmap
+#' @import ggplot2 scales ggmap gridExtra OutbreakTools
 #'
 
 ##################
@@ -66,7 +66,11 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
     ts.length <- as.integer(ceiling(diff(date.range)/bin)+1)
     dates.breaks <- seq(from=date.range[1], length=ts.length, by=bin)
 
-    ## ANNOTATIONS
+    ## get maximum incidence
+    incid <- get.incidence(x[,dates], from=start.at, to=stop.at, interval=bin)
+    max.incid <- max(incid, na.rm=TRUE)
+
+    ## annotations
     date.annot <- scale_x_date(limits=date.range, breaks = xbreaks,
                                labels=date_format(date.format))
     date.rota <- theme(axis.text.x = element_text(angle = angle, vjust = .5))
