@@ -111,6 +111,8 @@ setMethod("get.incidence2", "obkData", function(x, data, where=NULL, val.min=NUL
     res <- list(get.incidence(dates, from=from, to=to, interval=interval, add.zero=add.zero))
   }
 
+
+
   ## RETURN OUTPUT ##
   return(res)
 }) # end obkData method
