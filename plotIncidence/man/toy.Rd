@@ -2,7 +2,7 @@
 % Please edit documentation in R/docToy.R
 \name{toy}
 \alias{toy}
-\title{Toy outbreak dataset}
+\title{#' #' Toy outbreak dataset}
 \format{A data frame with 187 rows and 3 variables}
 \source{
 Michael Hohle's dataset Hagelloch

@@ -1,4 +1,22 @@
-#' Toy outbreak dataset
+#' plotIncidence: A package for plotting incidence data.
+#'
+#' This package provides functions for computing and plotting incidence data from outbreak line lists.
+#'
+#'
+#' @section Available functions include:
+#'  \itemize{
+#'  \item{plotIncidence}{Plot incidence time series using histograms}
+#' }
+##
+#'
+#' @docType package
+#' @name plotIncidence
+NULL
+
+
+
+
+#' #' #' Toy outbreak dataset
 #'
 #' This is a simplified version of Michael Hohle's dataset Hagelloch
 #'
