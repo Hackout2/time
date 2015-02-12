@@ -22,7 +22,9 @@
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #' @export
 #' @examples
+#' \dontrun{
 #'
+#' }
 #'
 #'
 #' @import ggplot2 scales ggmap gridExtra OutbreakTools
@@ -31,7 +33,7 @@
 ##################
 ## mapIncidence ##
 ##################
-mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
+mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google",
                           start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                           date.format="%d %b %Y", angle=45, xbreaks="1 week",
                           col.pal=1, heights=c(0.75, 0.25)) {
@@ -69,7 +71,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
 
     ## get maximum incidence
     incid <- get.incidence(x[,dates], from=start.at, to=stop.at, interval=bin)
-    max.incid <- max(incid, na.rm=TRUE)
+    max.incid <- max(incid$incidence, na.rm=TRUE)
 
     ## annotations
     date.annot <- scale_x_date(limits=date.range, breaks = xbreaks,
@@ -86,15 +88,17 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
                             max(lat,na.rm=TRUE)))
 
     ## fectch map
-    baseMap <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source))
+    base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source))
 
     ## compute cumulative incidence
     xyn <- na.omit(data.frame(xyTable(data.frame(lon,lat))))
     names(xyn)[3] <- "Incidence"
-    head(xyn)
+
+    ## get numbers for max number of cases
+    map.max.size <- max(xyn[3],na.rm=TRUE)
 
     ## get breaks for cum. incidence, force 1 to be in the scale
-    map.breaks <- pretty(1:max(xyn,na.rm=TRUE), n=6)
+    map.breaks <- pretty(1:map.max.size, n=6)
     map.breaks <- map.breaks[map.breaks>1] # remove potential 0/1
     map.breaks <- c(1,map.breaks)
 
@@ -102,8 +106,10 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
     ## GENERATE THE MOVIE ##
     for(i in 2:length(dates.breaks)){
         ## open png device
-        png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
+        ## png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
 
+
+        ## TOP PANEL: MAP
         ## data for cumulative incidence
         toKeep <- which(x[,dates] <= dates.breaks[i-1])
         xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c("lon","lat")])))
@@ -113,31 +119,28 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="osm",
         toKeep <- which(x[,dates] >= dates.breaks[i-1] &
                         x[,dates] < dates.breaks[i])
 
-        p1 <- basemap +
-            geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
-                       alpha=.4, col="black") +
-                           geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
-                                       col="red", alpha=.2, size=2,
-                                       position = position_jitter(h=.05, w=.05)) +
-                                           scale_size_continuous("Cumulative \nincidence",
-                                                                 range=c(2,15),
-                                                                 limits=c(0,MAX.NB.CASES),
-                                                                 breaks=c(1,50,100,200,500,1000)) +
-                                                                     theme_bw() +
-                                                                         labs(x=NULL,y=NULL)
+        p1 <- base.map +
+            suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
+                                        alpha=.4, col="black")) +
+            geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
+                        col="red", alpha=.2, size=2,
+                        position = position_jitter(h=.05, w=.05))
+            scale_size_continuous("Cumulative \nincidence", range=c(2,15),
+                                  limits=c(0,map.max.size), breaks=map.breaks) +
+            theme_bw() + labs(x=NULL,y=NULL)
 
+        ## BOTTOM PANEL: INCIDENCE TIME SERIES
         ## make incidence curve
         tempdat <- x[x[,dates]<=dates.breaks[i],]
         p2 <- ggplot(tempdat) +
-            geom_histogram(aes_string(x=dates, fill=fill.by, alpha=shade.by),
+            geom_histogram(aes_string(x=dates, fill=fill.by),
                            breaks=as.numeric(dates.breaks) + 0.01) +
-                               scale_y_continuous(limits=c(0, max.incid)) +
-                                   xy.labs + date.annot + date.rota
-
+            scale_y_continuous(limits=c(0, max.incid)) +
+            xy.labs + date.annot + date.rota
 
         grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1))
 
-        dev.off()
+        ## dev.off()
     }
 
     ## RETURN OUTPUT ##
