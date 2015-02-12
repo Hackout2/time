@@ -13,7 +13,8 @@
 #' for a description of the data.
 "hagelloch.obk"
 
-
+#' Function to create the hagelloch.obk data.
+#'
 create.hagelloch.obk <- function() {
   #Use Hagelloch measles data (as available in the surveillance package) instead
   load(system.file("data","hagelloch.RData", package="surveillance"))

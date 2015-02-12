@@ -6,6 +6,11 @@
 \usage{
 get.incidence2(x, ...)
 }
+\arguments{
+\item{x}{The object (typically obkdata) to compute the incidence for.}
+
+\item{...}{Whatever}
+}
 \description{
 Creates different time series based on the list of factor variables.
 This function should eventually migrate back into the OutbreakTools package.
