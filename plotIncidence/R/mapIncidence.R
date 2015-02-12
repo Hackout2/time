@@ -30,7 +30,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'
+#' data(zombie_outbreak)
+#' mapIncidence(head(zombie_outbreak,1000), 3,"x.coord","y.coord", fill.by="gender")
 #' }
 #'
 #'
@@ -51,6 +52,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
     if(is.numeric(dates)) dates <- names(x)[dates]
     lon <- x[,lon,drop=TRUE]
     lat <- x[,lat,drop=TRUE]
+    lonlat <- data.frame(lon,lat)
     if(!is.null(fill.by) && is.numeric(fill.by)) fill.by <- names(x)[fill.by]
     if(!is.null(col.pal) && (col.pal<0 || col.pal>8)) {
         col.pal <- NULL
@@ -76,7 +78,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
 
     ## find breaks
     ts.length <- as.integer(ceiling(diff(date.range)/bin)+1)
-    dates.breaks <- seq(from=date.range[1], length=ts.length, by=bin)
+    dates.breaks <- seq(from=date.range[1]-1, length=ts.length, by=bin)
 
     ## get maximum incidence
     incid <- get.incidence(x[,dates], from=start.at, to=stop.at, interval=bin)
@@ -118,7 +120,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             ## TOP PANEL: MAP
             ## data for cumulative incidence
             toKeep <- which(x[,dates] <= dates.breaks[i-1])
-            xyn.cum <- data.frame(xyTable(na.omit(data.frame(lon,lat)[toKeep,] )))
+            xyn.cum <- data.frame(xyTable(na.omit(lonlat[toKeep,] )))
             names(xyn.cum)[3] <- "Incidence"
 
             ## data for current incidence
@@ -128,7 +130,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             p1 <- base.map +
                 suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
                                             alpha=.4, col="black")) +
-                                                geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
+                                                geom_jitter(data=lonlat[toKeep,], aes(x=lon,y=lat),
                                                             col="red", alpha=.2, size=point.size,
                                                             position = position_jitter(h=.05, w=.05)) +
             scale_size_continuous("Cumulative \nincidence", range=c(2,15),
@@ -146,12 +148,11 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             tempdat <- x[x[,dates,]<=dates.breaks[i],,drop=FALSE]
             p2 <- ggplot(tempdat) +
                 geom_histogram(aes_string(x=dates, fill=fill.by),
-                               breaks=as.numeric(dates.breaks)) +
+                               breaks=as.numeric(dates.breaks)+0.01) +
                                geom_vline(xintercept = as.numeric(dates.breaks[i])) +
                                scale_y_continuous(limits=c(0, max.incid)) +
                                xy.labs + date.annot + date.rota +
                                theme(text = element_text(size=annot.size))
-
 
             suppressWarnings(grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1)))
 
