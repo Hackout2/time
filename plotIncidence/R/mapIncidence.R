@@ -104,44 +104,46 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
 
 
     ## GENERATE THE MOVIE ##
-    for(i in 2:length(dates.breaks)){
-        ## open png device
-        ## png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
+    saveHTML({
+        for(i in 2:length(dates.breaks)){
+            ## open png device
+            ## png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
 
 
-        ## TOP PANEL: MAP
-        ## data for cumulative incidence
-        toKeep <- which(x[,dates] <= dates.breaks[i-1])
-        xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c("lon","lat")])))
-        names(xyn.cum)[3] <- "Incidence"
+            ## TOP PANEL: MAP
+            ## data for cumulative incidence
+            toKeep <- which(x[,dates] <= dates.breaks[i-1])
+            xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c("lon","lat")])))
+            names(xyn.cum)[3] <- "Incidence"
 
-        ## data for current incidence
-        toKeep <- which(x[,dates] >= dates.breaks[i-1] &
-                        x[,dates] < dates.breaks[i])
+            ## data for current incidence
+            toKeep <- which(x[,dates] >= dates.breaks[i-1] &
+                            x[,dates] < dates.breaks[i])
 
-        p1 <- base.map +
-            suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
-                                        alpha=.4, col="black")) +
-            geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
-                        col="red", alpha=.2, size=2,
-                        position = position_jitter(h=.05, w=.05))
+            p1 <- base.map +
+                suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
+                                            alpha=.4, col="black")) +
+                                                geom_jitter(data=x[toKeep,], aes(x=lon,y=lat),
+                                                            col="red", alpha=.2, size=2,
+                                                            position = position_jitter(h=.05, w=.05)) +
             scale_size_continuous("Cumulative \nincidence", range=c(2,15),
                                   limits=c(0,map.max.size), breaks=map.breaks) +
-            theme_bw() + labs(x=NULL,y=NULL)
+                                      theme_bw() + labs(x=NULL,y=NULL)
 
-        ## BOTTOM PANEL: INCIDENCE TIME SERIES
-        ## make incidence curve
-        tempdat <- x[x[,dates]<=dates.breaks[i],]
-        p2 <- ggplot(tempdat) +
-            geom_histogram(aes_string(x=dates, fill=fill.by),
-                           breaks=as.numeric(dates.breaks) + 0.01) +
-            scale_y_continuous(limits=c(0, max.incid)) +
-            xy.labs + date.annot + date.rota
+            ## BOTTOM PANEL: INCIDENCE TIME SERIES
+            ## make incidence curve
+            tempdat <- x[x[,dates]<=dates.breaks[i],]
+            p2 <- ggplot(tempdat) +
+                geom_histogram(aes_string(x=dates, fill=fill.by),
+                               breaks=as.numeric(dates.breaks) + 0.01) +
+                                   scale_y_continuous(limits=c(0, max.incid)) +
+                                       xy.labs + date.annot + date.rota
 
-        grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1))
+            grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1))
 
-        ## dev.off()
-    }
+            ## dev.off()
+        }
+    })
 
     ## RETURN OUTPUT ##
     return(out)
