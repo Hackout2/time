@@ -5,6 +5,7 @@
 
 #Load the package itself.
 library("linelist2ts")
+
 #Load extra libraries for the visualization
 library("dygraphs")
 library("RColorBrewer")
@@ -33,6 +34,10 @@ plot(as.zoo(sts.xts), plot.type="single",col=pal,lwd=3,xlab="Onset of rash",ylab
 grid(ny=NULL,nx=NA,col="darkgray")
 legend(x="topleft",colnames(sts.xts),col=pal,lwd=3)
 
+plot(as.zoo(sts.xts), plot.type="multiple",col=pal,lwd=3,xlab="Onset of rash",ylab="No. individuals",type="l",main="")
+
+
+
 ##########ggplot2 like plots from zoo objects ############
 #(see http://stackoverflow.com/questions/13848218/drawing-a-multiline-graph-with-ggplot2-from-a-zoo-object)
 p <- autoplot(sts.xts, facet = NULL)
@@ -42,8 +47,9 @@ p + scale_x_date(labels = date_format("%d-%b"), xlab("Onset of rash")) +  scale_
 
 ############# Interactive graphics using dygraph ###########
 #You can click and drag to zoom. Double-clicking will zoom you back out. Shift-drag will pan
-#See also: http://dygraphs.com/
-foo <- dygraph(sts.xts, main = "Hagelloch") %>%
+#See also: http://dygraphs.com/.
+#Just show the first two series.
+foo <- dygraph(sts.xts[,1:2], main = "Hagelloch") %>%
   dyRangeSelector(dateWindow = range(index(sts.xts)))
 foo
 
