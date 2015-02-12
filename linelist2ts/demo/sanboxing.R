@@ -1,8 +1,3 @@
-#' None package material experimental code for getting incidence curves.
-#'
-#' @author Michael Höhle <http://www.math.su.se/~hoehle>
-#'
-
 #Load the package itself.
 library("linelist2ts")
 

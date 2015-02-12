@@ -3,4 +3,5 @@
 export(get.incidence2)
 export(inc2xts)
 export(monday)
+export(wdaymon)
 exportMethods(get.incidence2)

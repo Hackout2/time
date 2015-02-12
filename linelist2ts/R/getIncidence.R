@@ -3,20 +3,28 @@
 #' Creates different time series based on the list of factor variables.
 #' This function should eventually migrate back into the OutbreakTools package.
 #'
+#' @param x The object (typically obkdata) to compute the incidence for.
+#' @param ... Whatever
+#'
 #' @author Michael Höhle
 #' @export
 setGeneric("get.incidence2", function(x, ...) standardGeneric("get.incidence2"))
 
-####################
-## obkData method ##
-####################
-##
-## based on 'dates' associated to a given field
-## 'values' are optional and can be used to subset the retained 'dates'
-## (e.g. define what a positive case is)
-
-#' More powerful get.incidence method for obkData
+#' Modified obkData method such that doBy statements are possible
 #'
+#' @param x  See obkData::get.incidence
+#' @param data  See obkData::get.incidence
+#' @param where  See obkData::get.incidence
+#' @param val.min  See obkData::get.incidence
+#' @param val.max  See obkData::get.incidence
+#' @param val.kept  See obkData::get.incidence
+#' @param regexp  See obkData::get.incidence
+#' @param from  See obkData::get.incidence
+#' @param to  See obkData::get.incidence
+#' @param interval  See obkData::get.incidence
+#' @param add.zero See obkData::get.incidence
+#' @param doBy A character list of factor variables in the individuals slot to compute the ts for.
+#' @param ...  See obkData::get.incidence
 #' @export
 setMethod("get.incidence2", "obkData", function(x, data, where=NULL, val.min=NULL, val.max=NULL, val.kept=NULL, regexp=NULL,
                                                from=NULL, to=NULL, interval=1, add.zero=TRUE, doBy=NULL, ...){
@@ -124,54 +132,13 @@ setMethod("get.incidence2", "obkData", function(x, data, where=NULL, val.min=NUL
 #' @return An xts object corresponding to the flattened incList
 #' @export
 inc2xts <- function(incList) {
-  #Convert each entry of incList from data.frame to xts. It's a list of xts obj
-  #xtsList <- lapply(incList, function(list) {
-  #  lapply(list, function(df) {
-  #    with(df,  as.xts(incidence, order.by=date))
-  #  })
-  #})
-
-  #Code looping over all xts entries and merging them. data.table or plyr
-  #might do this better?
-  #xts <- Reduce(cbind,lapply(xtsList, function(list) Reduce(cbind, list)))
-
-  #Manual way of getting pretty (?) column names
-  #lvl1 <- names(xtsList)
-  #lvl2 <- lapply(xtsList, names)
-  #mynames <- paste(rep(lvl1,times=sapply(lvl2,length)), do.call(c,lvl2),sep="-")
-  #dimnames(xts)[[2]] <- mynames
-
-  #Alternative way of doing this. Boil down the data.frame and make an xts object out of it
-  #df <- do.call(cbind.data.frame, lapply(incList, function(x) do.call(cbind.data.frame, x)))
-  #df <- do.call(cbind.data.frame,unlist(incList,recursive=FALSE))
-
-  #incidence <- df[,seq(2,ncol(df),by=2)]
-  #Make the names prettier
-  #colnames(incidence) <- gsub("\\.incidence$","",colnames(incidence))
 
   #This was really the most efficient way of collapsing it.
   df <- sapply(unlist(incList,recursive=FALSE), "[[", 2)
 
   #Create xts object
-  xts <- xts(x=incidence, order.by=incList[[1]][[1]]$date)
+  xts <- xts(x=df, order.by=incList[[1]][[1]]$date)
 
   return(xts)
 }
 
-sandboxIt <- function() {
-  source("getIncidence.R")
-
-  #Add extra column
-  hagelloch.obk@individuals$AGEGRP <- cut(hagelloch.obk@individuals$AGE, breaks=c(0,5,10,Inf))
-
-
-  inc <- get.incidence2(hagelloch.obk, "timeERU", doBy=c("SEX","CL"), add.zero=FALSE)
-
-  #Show the time series.
-  plot(inc2xts(inc))
-  plot(as.zoo(inc2xts(inc)),plot.type='multiple')
-  plot(as.zoo(inc2xts(inc)), screens=1,col=c("magenta","steelblue"),lwd=3,type="h",cex.axis=0.8)
-
-  plot(as.zoo(inc2xts(inci)), plot.type='multiple')
-
-}
