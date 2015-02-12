@@ -25,14 +25,16 @@
 #' @param xy.annot a logical indicating whether latitudes and longitudes should be shown
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
+#'
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #'
 #' }
 #'
 #'
-#' @import ggplot2 scales ggmap gridExtra OutbreakTools
+#' @import ggplot2 scales ggmap gridExtra OutbreakTools animation
 #'
 
 ##################
@@ -40,7 +42,7 @@
 ##################
 mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google",
                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
-                         date.format="%d %b %Y", angle=45, xbreaks="1 week",
+                         date.format="%d %b %Y", angle=90, xbreaks="1 week",
                          col.pal=1, heights=c(0.75, 0.25),
                          ani.width=800, ani.height=ani.width,
                          point.size=5, annot.size=20, xy.annot=FALSE) {
@@ -113,14 +115,10 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
     ## GENERATE THE MOVIE ##
     saveHTML({
         for(i in 2:length(dates.breaks)){
-            ## open png device
-            ## png(paste("movie/png/fig-",i-1,".png",sep=""), res=150, width=1000, height=1000)
-
-
             ## TOP PANEL: MAP
             ## data for cumulative incidence
             toKeep <- which(x[,dates] <= dates.breaks[i-1])
-            xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c("lon","lat")])))
+            xyn.cum <- data.frame(xyTable(na.omit(data.frame(lon,lat)[toKeep,] )))
             names(xyn.cum)[3] <- "Incidence"
 
             ## data for current incidence
@@ -145,10 +143,10 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
 
             ## BOTTOM PANEL: INCIDENCE TIME SERIES
             ## make incidence curve
-            tempdat <- x[x[,dates]<=dates.breaks[i],]
+            tempdat <- x[x[,dates,]<=dates.breaks[i],,drop=FALSE]
             p2 <- ggplot(tempdat) +
                 geom_histogram(aes_string(x=dates, fill=fill.by),
-                               breaks=as.numeric(dates.breaks) + 0.01) +
+                               breaks=as.numeric(dates.breaks)) +
                                geom_vline(xintercept = as.numeric(dates.breaks[i])) +
                                scale_y_continuous(limits=c(0, max.incid)) +
                                xy.labs + date.annot + date.rota +
