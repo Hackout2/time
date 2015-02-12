@@ -1,5 +1,3 @@
-setwd("/Users/rolinavangaalen/Documents/Hackout/time/linelist2sts/")
-
 library("OutbreakTools")
 library("surveillance")
 source("hagelloch2obkData.R")

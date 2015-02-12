@@ -1,0 +1,9 @@
+Package: linelist2ts
+Title: Convert linelists to xts/zoo time series objects and display them.
+Version: 0.0.0.9000
+Authors@R: person("Michael", "Höhle", , "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph)
+Depends: R (>= 3.1.2), OutbreakTools, xts, zoo
+License: What license is it under?
+LazyData: true
+Encoding: UTF8
