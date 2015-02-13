@@ -6,11 +6,12 @@
 #' @section Available functions include:
 #'  \itemize{
 #'  \item{plotIncidence}{Plot incidence time series using histograms}
+#'  \item{mapIncidence}{Visualise incidence in space and time using animations}
 #' }
 ##
 #'
 #' @docType package
-#' @name plotIncidence
+#' @name vizIncidence
 NULL
 
 
@@ -34,7 +35,7 @@ NULL
 
 #' #' #' Zombie outbreak dataset
 #'
-#' This is a dataset simulating an outbreak with geo-localisation of the cases (6 localities)  
+#' This is a dataset simulating an outbreak with geo-localisation of the cases (6 localities)
 #'
 #' \itemize{
 #'   \item x.coord a vector of x coordinates
