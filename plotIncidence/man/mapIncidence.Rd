@@ -9,7 +9,7 @@ mapIncidence(x, dates, lon, lat, fill.by = NULL, col.pal = 0, alpha = 0.5,
   start.at = NULL, stop.at = NULL, xlab = NULL, ylab = "Incidence",
   date.format = "\%d \%b \%Y", angle = 90, xbreaks = "1 week",
   heights = c(0.75, 0.25), ani.width = 800, ani.height = ani.width,
-  point.size = 5, annot.size = 20, xy.annot = FALSE)
+  point.size = 5, annot.size = 20, xy.annot = FALSE, path = tempdir())
 }
 \arguments{
 \item{x}{a data.frame containing the data to be plotted.}
@@ -59,14 +59,20 @@ mapIncidence(x, dates, lon, lat, fill.by = NULL, col.pal = 0, alpha = 0.5,
 \item{annot.size}{an integer indicating the size of the text annotations}
 
 \item{xy.annot}{a logical indicating whether latitudes and longitudes should be shown}
+
+\item{path}{a character string indicating the path used to save the created files}
 }
 \description{
 This function provides advanced plotting facilities for incidence time series using ggplot2
 }
 \examples{
 \dontrun{
+
 data(zombie_outbreak)
-mapIncidence(head(zombie_outbreak,1000), 3,"x.coord","y.coord", fill.by="gender")
+mapIncidence(head(zombie_outbreak,1000), 3,
+             "x.coord","y.coord", fill.by="gender",
+              zoom=11)
+
 }
 }
 \author{

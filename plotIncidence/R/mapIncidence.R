@@ -26,6 +26,7 @@
 #' @param point.size an integer indicating the size of point to be used for incidence
 #' @param annot.size an integer indicating the size of the text annotations
 #' @param xy.annot a logical indicating whether latitudes and longitudes should be shown
+#' @param path a character string indicating the path used to save the created files
 #'
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #'
@@ -34,12 +35,15 @@
 #'
 #' @examples
 #' \dontrun{
+#'
 #' data(zombie_outbreak)
-#' mapIncidence(head(zombie_outbreak,1000), 3,"x.coord","y.coord", fill.by="gender",zoom=11)
+#' mapIncidence(head(zombie_outbreak,1000), 3,
+#'              "x.coord","y.coord", fill.by="gender",
+#'               zoom=11)
+#'
 #' }
 #'
 #'
-
 ##################
 ## mapIncidence ##
 ##################
@@ -48,8 +52,9 @@ mapIncidence <- function(x, dates, lon, lat, fill.by=NULL, col.pal=0, alpha=.5, 
                          start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                          date.format="%d %b %Y", angle=90, xbreaks="1 week",
                          heights=c(0.75, 0.25), ani.width=800, ani.height=ani.width,
-                         point.size=5, annot.size=20, xy.annot=FALSE) {
-
+                         point.size=5, annot.size=20, xy.annot=FALSE,
+                         path=tempdir()) {
+ 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
     if(is.numeric(lon)) lon <- names(x)[lon]
@@ -106,10 +111,11 @@ mapIncidence <- function(x, dates, lon, lat, fill.by=NULL, col.pal=0, alpha=.5, 
                             max(x[,lat],na.rm=TRUE)))
 
     ## fectch map
+    filename <- paste(path,"ggmapTemp.png",sep="/")
     if(is.null(zoom)) {
-        base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source))
+        base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source, filename=filename))
     } else {
-        base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source, zoom=zoom))
+        base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source, zoom=zoom, filename=filename))
     }
 
     ## compute cumulative incidence
@@ -127,6 +133,11 @@ mapIncidence <- function(x, dates, lon, lat, fill.by=NULL, col.pal=0, alpha=.5, 
 
 
     ## GENERATE THE MOVIE ##
+    ## set working directory
+    odir <- getwd()
+    on.exit(setwd(odir))
+    setwd(path)
+
     saveHTML({
         for(i in 2:length(dates.breaks)){
             ## TOP PANEL: MAP
@@ -144,7 +155,7 @@ mapIncidence <- function(x, dates, lon, lat, fill.by=NULL, col.pal=0, alpha=.5, 
                                             alpha=.5, col="black")) +
                                                 geom_jitter(data=x[toKeep,], aes_string(x=lon,y=lat,colour=fill.by),
                                                             alpha=alpha, size=point.size,
-                                                            position = position_jitter(h=jitter/2, w=jitter)) +
+                                                            position = position_jitter(height=jitter/2, width=jitter)) +
             scale_size_continuous("Cumulative \nincidence", range=c(2,15),
                                   limits=c(0,map.max.size), breaks=map.breaks) +
                                       theme_bw() + labs(x=NULL,y=NULL) +
