@@ -10,7 +10,7 @@ monday(date)
 \item{date}{vector of dates}
 }
 \value{
-vector of dates
+vector of dates containing the corresponding mondays
 }
 \description{
 Function to get the monday of the corresponding week a date belongs to.

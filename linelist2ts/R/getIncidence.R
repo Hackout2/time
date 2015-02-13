@@ -142,3 +142,63 @@ inc2xts <- function(incList) {
   return(xts)
 }
 
+#' Simple aggregator based on the data.table function
+#'
+#' @param formula Formula of type LHSVar ~ RHSVar, where LHSVar is
+#'                 a column of class Dates and RHSVar is a column containing a factor variable
+#' @param dateProjFun Date projection function, i.e. how are dates projected down (i.e. monday, start of month, etc.). Result must be a Date again!
+#' @param dRange Vector of length two giving the start and stop dates, the actual range will be range(dateProjFun(dRange)).
+#' @param data data.frame containing the LHSVar RHSVar variables.
+#' @return xts time series
+#' @export
+linelist2xts <- function(formula, dateProjFun=identity, dRange=NULL, data) {
+  #Dirty unwrapping of the formula. Use boxplot way.
+  if (formula[[1]] != "~") stop("Not a valid formula.")
+  LHSVar <- as.character(formula[[2]])
+  RHSVar <- as.character(formula[[3]])
+  #Check
+  if (!class(data[,LHSVar]) == "Date") stop("LHSVar is not a vector of dates.")
+  if (RHSVar == "1") {
+    data[,RHSVar] <- factor( rep("all", nrow(data), levels=c("all")))
+  }
+  if (!is.factor(data[,RHSVar])) stop("RHSVar is not a vector of dates.")
+
+  #Convert data.frame to a data.table
+  dt <- data.table(data)
+
+  #Select which date column to do the aggregation by and make a column data
+  dt$mydate <- dt[[LHSVar]]
+  dt$split <- dt[[RHSVar]]
+  RHSLevels <- levels(dt[[RHSVar]])
+
+  ## data.table of all dates, to fill in incince
+  if (is.null(dRange)) {
+    dRange <- range(dt[[LHSVar]])
+  }
+
+  #Make a data.table with zeroes spanning the necessary range
+  dRangeSeq <- unique(dateProjFun(seq.Date(dRange[1], dRange[2], by = 1)))
+  emptySeries <- data.table(mydate = dRangeSeq)
+
+
+  #Allocate empty result object and build it with cbind
+  res <- xts::xts(x=NULL, order.by=dRangeSeq)
+
+  for (i in seq_len(length(RHSLevels))) {
+    #Aggregate for each factor level
+    tsWithGaps <- dt[!is.na(mydate) & (split == RHSLevels[i]) , list(freq = .N), by = list(mydate=dateProjFun(mydate))]
+#browser()
+
+    #Merge with the empty series
+    ts <- merge(tsWithGaps, emptySeries, by = "mydate", all.y = TRUE)
+    #Convert NA's to zeroes
+    ts[is.na(freq), freq := 0]
+    #Append result
+    res <- cbind(res, xts::xts(x=ts[["freq"]],order.by=dRangeSeq))
+  }
+  #Nice col names
+  colnames(res) <- RHSLevels
+
+  return(res)
+}
+
