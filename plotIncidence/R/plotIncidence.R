@@ -47,6 +47,7 @@ plotIncidence <- function(x, dates, bin=7, fill.by=NULL, split.by=NULL, shade.by
     if(!is.null(fill.by) && is.numeric(fill.by)) fill.by <- names(x)[fill.by]
     if(!is.null(split.by) && is.numeric(split.by)) split.by <- names(x)[split.by]
     if(!is.null(shade.by) && is.numeric(shade.by)) shade.by <- names(x)[shade.by]
+    if(!is.null(col.pal) && col.pal==0) col.pal <- NULL # 0 will be the default palette
     if(!is.null(col.pal) && (col.pal<0 || col.pal>8)) {
         col.pal <- NULL
         warning("col.pal must be an integer from 1 to 8 - setting col.pal=NULL")

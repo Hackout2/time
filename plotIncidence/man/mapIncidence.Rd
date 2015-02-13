@@ -4,12 +4,12 @@
 \alias{mapIncidence}
 \title{Plot incidence time series using histograms}
 \usage{
-mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL,
-  source = "google", zoom = "auto", start.at = NULL, stop.at = NULL,
-  xlab = NULL, ylab = "Incidence", date.format = "\%d \%b \%Y",
-  angle = 90, xbreaks = "1 week", col.pal = 1, heights = c(0.75, 0.25),
-  ani.width = 800, ani.height = ani.width, point.size = 5,
-  annot.size = 20, xy.annot = FALSE)
+mapIncidence(x, dates, lon, lat, fill.by = NULL, col.pal = 0, alpha = 0.5,
+  bin = 7, jitter = 0.01, source = "google", zoom = NULL,
+  start.at = NULL, stop.at = NULL, xlab = NULL, ylab = "Incidence",
+  date.format = "\%d \%b \%Y", angle = 90, xbreaks = "1 week",
+  heights = c(0.75, 0.25), ani.width = 800, ani.height = ani.width,
+  point.size = 5, annot.size = 20, xy.annot = FALSE)
 }
 \arguments{
 \item{x}{a data.frame containing the data to be plotted.}
@@ -20,11 +20,19 @@ mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL,
 
 \item{lat}{a character string or an integer indicating which column contains latitudes ('y axis')}
 
-\item{bin}{an integer indicating the size of the time window (in days) to use for the incidence computation}
-
 \item{fill.by}{a character string or an integer indicating which column to use to color the bars}
 
+\item{col.pal}{an integer between 1 and 8 indicating a color palette to be used; if 0 or NULL, the default color palette of ggplot2 is used}
+
+\item{alpha}{a numeric value between 0 and 1 handling transparency, with 0 being fulling transparent and 1 having no transparency}
+
+\item{bin}{an integer indicating the size of the time window (in days) to use for the incidence computation}
+
+\item{jitter}{a numeric value indicating the amount of random noise added to the locations of new cases}
+
 \item{source}{a character string indicating the type of maps to be used}
+
+\item{zoom}{an integer indicating the level of zoom to be used for the map, from 3 (continent) to 21 (building); see \link[ggmap]{get_map}}
 
 \item{start.at}{a starting date for the incidence; defaults to the earliest date of the dataset}
 
@@ -39,8 +47,6 @@ mapIncidence(x, dates, lon, lat, bin = 7, fill.by = NULL,
 \item{angle}{an integer indicating the angle of the dates}
 
 \item{xbreaks}{a character string indicating the time interval between vertical lines}
-
-\item{col.pal}{an integer between 1 and 8 indicating a color palette to be used; if NULL, the default color palette of ggplot2 is used}
 
 \item{heights}{a vector of two numbers summing to 1 indicating the relative heights of the map and the incidence time series}
 
