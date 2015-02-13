@@ -27,6 +27,7 @@
 #' @author Thibaut Jombart \email{thibautjombart@@gmail.com}
 #'
 #' @export
+#' @import ggplot2 scales ggmap gridExtra OutbreakTools animation
 #'
 #' @examples
 #' \dontrun{
@@ -35,25 +36,21 @@
 #' }
 #'
 #'
-#' @import ggplot2 scales ggmap gridExtra OutbreakTools animation
-#'
 
 ##################
 ## mapIncidence ##
 ##################
-mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google",
-                         zoom = "auto",
-                         start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
+mapIncidence <- function(x, dates, lon, lat, fill.by=NULL, col.pal=1, bin=7, source="google",
+                         zoom = "auto", start.at=NULL, stop.at=NULL, xlab=NULL, ylab="Incidence",
                          date.format="%d %b %Y", angle=90, xbreaks="1 week",
-                         col.pal=1, heights=c(0.75, 0.25),
-                         ani.width=800, ani.height=ani.width,
+                         heights=c(0.75, 0.25), ani.width=800, ani.height=ani.width,
                          point.size=5, annot.size=20, xy.annot=FALSE) {
 
     ## HANDLE ARGUMENTS ##
     if(is.numeric(dates)) dates <- names(x)[dates]
-    lon <- x[,lon,drop=TRUE]
-    lat <- x[,lat,drop=TRUE]
-    lonlat <- data.frame(lon,lat)
+    if(is.numeric(lon)) lon <- names(x)[lon]
+    if(is.numeric(lat)) lat <- names(x)[lat]
+    ##lonlat <- data.frame(lon,lat)
     if(!is.null(fill.by) && is.numeric(fill.by)) fill.by <- names(x)[fill.by]
     if(!is.null(col.pal) && (col.pal<0 || col.pal>8)) {
         col.pal <- NULL
@@ -94,16 +91,16 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
 
     ## GET MAP MATERIAL ##
     ## get bounding box
-    bound.box <- with(x, c(min(lon,na.rm=TRUE),
-                            min(lat,na.rm=TRUE),
-                            max(lon,na.rm=TRUE),
-                            max(lat,na.rm=TRUE)))
+    bound.box <- with(x, c(min(x[,lon],na.rm=TRUE),
+                            min(x[,lat],na.rm=TRUE),
+                            max(x[,lon],na.rm=TRUE),
+                            max(x[,lat],na.rm=TRUE)))
 
     ## fectch map
     base.map <- ggmap(get_map(bound.box + c(-1,-1,1,1), source=source, zoom=zoom))
 
     ## compute cumulative incidence
-    xyn <- na.omit(data.frame(xyTable(data.frame(lon,lat))))
+    xyn <- na.omit(data.frame(xyTable(x[,c(lon,lat)])))
     names(xyn)[3] <- "Incidence"
 
     ## get numbers for max number of cases
@@ -121,7 +118,7 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             ## TOP PANEL: MAP
             ## data for cumulative incidence
             toKeep <- which(x[,dates] <= dates.breaks[i-1])
-            xyn.cum <- data.frame(xyTable(na.omit(lonlat[toKeep,] )))
+            xyn.cum <- data.frame(xyTable(na.omit(x[toKeep,c(lon,lat)])))
             names(xyn.cum)[3] <- "Incidence"
 
             ## data for current incidence
@@ -131,18 +128,20 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
             p1 <- base.map +
                 suppressWarnings(geom_point(data=xyn.cum, aes(x=x,y=y,size=Incidence),
                                             alpha=.4, col="black")) +
-                                                geom_jitter(data=lonlat[toKeep,], aes(x=lon,y=lat),
-                                                            col="red", alpha=.2, size=point.size,
+                                                geom_jitter(data=x[toKeep,], aes_string(x=lon,y=lat,colour=fill.by),
+                                                            alpha=.2, size=point.size,
                                                             position = position_jitter(h=.05, w=.05)) +
             scale_size_continuous("Cumulative \nincidence", range=c(2,15),
                                   limits=c(0,map.max.size), breaks=map.breaks) +
                                       theme_bw() + labs(x=NULL,y=NULL) +
+                                      scale_colour_discrete(guide=FALSE) +
                                       theme(text = element_text(size=annot.size))
 
             if(!xy.annot) p1 <- p1 + theme(axis.text.x = element_blank(),
-                                          axis.ticks.x = element_blank(),
-                                          axis.text.y = element_blank(),
-                                          axis.ticks.y = element_blank())
+                                           axis.ticks.x = element_blank(),
+                                           axis.text.y = element_blank(),
+                                           axis.ticks.y = element_blank())
+            if(!is.null(col.pal)) p1 <- p1 + scale_colour_brewer(type="qual", palette=col.pal, guide=FALSE)
 
             ## BOTTOM PANEL: INCIDENCE TIME SERIES
             ## make incidence curve
@@ -153,7 +152,10 @@ mapIncidence <- function(x, dates, lon, lat, bin=7, fill.by=NULL, source="google
                                geom_vline(xintercept = as.numeric(dates.breaks[i])) +
                                scale_y_continuous(limits=c(0, max.incid)) +
                                xy.labs + date.annot + date.rota +
+                               scale_colour_discrete(drop = FALSE) +
                                theme(text = element_text(size=annot.size))
+
+            if(!is.null(col.pal)) p2 <- p2 + scale_fill_brewer(type="qual", palette=col.pal, drop=FALSE)
 
             suppressWarnings(grid.arrange(arrangeGrob(p1,p2, heights=c(3/4, 1/4), ncol=1)))
 
