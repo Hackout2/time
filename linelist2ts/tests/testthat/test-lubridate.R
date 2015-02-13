@@ -1,4 +1,5 @@
 context("ISO8601 Date playing")
+library("linelist2ts")
 
 #Generate some dates
 d <- as.Date("2001-01-01") + 0:6

@@ -24,13 +24,20 @@ inc <- get.incidence2(hagelloch.obk, "timeERU", doBy=c("SEX","CL"), add.zero=FAL
 sts.xts <- inc2xts(inc)
 
 ################## plot.zoo visualization ################
-pal <- brewer.pal(n=ncol(sts.xts),"Set3")
+pal <- brewer.pal(n=ncol(sts.xts),"Set2")
 plot(as.zoo(sts.xts), plot.type="single",col=pal,lwd=3,xlab="Onset of rash",ylab="No. individuals",type="l")
 grid(ny=NULL,nx=NA,col="darkgray")
 legend(x="topleft",colnames(sts.xts),col=pal,lwd=3)
 
-plot(as.zoo(sts.xts), plot.type="multiple",col=pal,lwd=3,xlab="Onset of rash",ylab="No. individuals",type="l",main="")
+#plot(as.zoo(sts.xts), plot.type="multiple",col=pal,lwd=3,xlab="Onset of rash",ylab="No. individuals",type="l",main="")
 
+#Alternative way to get the multiple plot with correct cex
+#See http://r.789695.n4.nabble.com/cex-lab-ignored-in-plot-zoo-for-multiple-plots-td4642295.html
+e <- local({
+  mtext <- function(...) graphics::mtext(..., cex = 0.7)
+  environment(plot.zoo) <-  environment()
+})
+with(e, plot.zoo)(as.zoo(sts.xts), col=pal, lwd=3,,xlab="Onset of rash",type="l",main="")
 
 
 ##########ggplot2 like plots from zoo objects ############

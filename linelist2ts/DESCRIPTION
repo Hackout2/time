@@ -3,9 +3,10 @@ Title: Convert linelists to xts/zoo time series objects and display them.
 Version: 0.0.0.9000
 Authors@R: person("Michael", "Höhle", , "first.last@example.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph)
-Depends: R (>= 3.1.2), methods
-Imports: xts, zoo, lubridate
+Depends: R (>= 3.1.2)
+Imports: lubridate
+Suggests: testthat, xts, zoo
 Enhances: OutbreakTools
-License: MIT
+License: GPL-3
 LazyData: true
 Encoding: UTF-8

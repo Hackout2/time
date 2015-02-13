@@ -1,21 +1,8 @@
-#' Converted Hagelloch 1861 measles outbreak into obkData format.
-#'
-#' Small converter function to take the hagelloch.df data.frame
-#' available in the surveillance package and make an obkData object
-#' out of it.
-#' @name hagelloch.obk
-#' @docType data
-#' @author Michael Höhle <http://www.math.su.se/~hoehle>
-#' @references \url{data_blah.com}
-#' @keywords data
-#' @details This function is not really one you would put in a package.
-#' Instead, the function would be called for it's output. See the surveillance package
-#' for a description of the data.
-"hagelloch.obk"
+#Script to generate Hagelloch data
 
-#' Function to create the hagelloch.obk data.
-#'
-create.hagelloch.obk <- function() {
+library("OutbreakTools")
+
+hagelloch.obk <- (function() {
   #Use Hagelloch measles data (as available in the surveillance package) instead
   load(system.file("data","hagelloch.RData", package="surveillance"))
 
@@ -42,8 +29,8 @@ create.hagelloch.obk <- function() {
   all.equal(hagelloch.obk@records$PRO$date,foo[1:nrow(hagelloch.df)])
 
   return(hagelloch.obk)
-}
+})()
 
-library("OutbreakTools")
-hagelloch.obk <- create.hagelloch.obk()
+#
+#hagelloch.obk <- create.hagelloch.obk()
 
